@@ -175,18 +175,21 @@ from them.
 #### Reading it on your phone
 
 The page is a private claude.ai artifact, so it opens wherever you are
-signed in to the same Claude account:
+signed in to the same Claude account — including the Claude mobile app.
 
 1. Run `skim` once on your computer — it publishes the page and prints its
    link (also saved in `data/web/artifact-url`). The link never changes;
    every run updates the same page.
-2. On the phone, open that link in the **Claude app** or in a mobile
-   browser signed in to the same account. Without signing in the page
-   won't open — it is private unless you share it from its Share menu.
-3. Find it again any time in your artifacts on claude.ai; `skim` can also
-   pin it to the claude.ai sidebar.
-4. For one-tap access, open the link in Safari or Chrome and choose
-   **Share → Add to Home Screen**.
+2. **Get it into the Claude app (easiest):** in Claude Code, ask Claude to
+   *pin the digest page*. Pinned artifacts appear in the claude.ai sidebar,
+   which the Claude app on your phone shares — open the sidebar there and
+   tap **Skim**. Nothing to copy between devices.
+3. Or send yourself the link (notes, messages, mail) and open it on the
+   phone in the Claude app or a mobile browser signed in to the same
+   account. Without signing in it won't open — the page is private unless
+   you share it from its Share menu.
+4. For one-tap access from the home screen, open the link in Safari or
+   Chrome and choose **Share → Add to Home Screen**.
 
 Votes you give on the phone are imported the next time `skim` runs on
 your computer.
