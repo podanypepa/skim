@@ -59,11 +59,27 @@ func TestWrapperPrefersRepoSourceWithGo(t *testing.T) {
 	}
 }
 
+// toolsWithoutGo returns a directory with only the commands the wrapper
+// needs, so the test really runs without Go (CI images have /usr/bin/go).
+func toolsWithoutGo(t *testing.T) string {
+	dir := t.TempDir()
+	for _, name := range []string{"bash", "sh", "dirname", "basename", "readlink"} {
+		p, err := exec.LookPath(name)
+		if err != nil {
+			t.Skipf("%s not found", name)
+		}
+		if err := os.Symlink(p, filepath.Join(dir, name)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return dir
+}
+
 // Without Go, an installed binary is used.
 func TestWrapperUsesBinaryWithoutGo(t *testing.T) {
 	fake := t.TempDir()
 	os.WriteFile(filepath.Join(fake, "skim"), []byte("#!/bin/sh\necho installed-binary \"$@\"\n"), 0o755)
-	out, err := runWrapper(t, wrapperPath(t), fake+":/usr/bin:/bin", "version")
+	out, err := runWrapper(t, wrapperPath(t), fake+":"+toolsWithoutGo(t), "version")
 	if err != nil || !strings.Contains(out, "installed-binary version") {
 		t.Fatalf("err=%v out=%q", err, out)
 	}
