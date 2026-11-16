@@ -16,3 +16,8 @@ type Feedback struct {
 func AppendFeedback(dataDir string, recs []Feedback) error {
 	return appendJSONL(filepath.Join(dataDir, "feedback.jsonl"), recs)
 }
+
+// ReadFeedback reads dataDir/feedback.jsonl, skipping malformed lines.
+func ReadFeedback(dataDir string) ([]Feedback, error) {
+	return readJSONL(filepath.Join(dataDir, "feedback.jsonl"), func(f Feedback) bool { return len(f.IDs) > 0 && f.Vote != "" })
+}

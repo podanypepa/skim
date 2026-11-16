@@ -54,7 +54,7 @@ func runCandidates(o CandOptions, out io.Writer) error {
 		cs = append(cs, Candidate{
 			ID: id, Topic: e.Topic, Score: e.Triage.Score, Reason: e.Triage.Reason,
 			FeedTitle: e.FeedTitle, Title: e.Title, URL: e.URL, Published: e.Published,
-			Excerpt: truncateRunes(e.Content, o.Excerpt),
+			Excerpt: truncateRunes(bestText(e), o.Excerpt),
 		})
 		sum.ByScore[strconv.Itoa(e.Triage.Score)]++
 	}
@@ -69,4 +69,12 @@ func runCandidates(o CandOptions, out io.Writer) error {
 		}
 	}
 	return enc.Encode(sum)
+}
+
+// bestText prefers fetched full text over a shorter feed excerpt.
+func bestText(e *entry) string {
+	if f := e.Fulltext; f != nil && f.Status == "ok" && len(f.Content) > len(e.Content) {
+		return f.Content
+	}
+	return e.Content
 }

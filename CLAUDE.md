@@ -17,7 +17,7 @@ parsování, ukládání). Z Go nástrojů později může vyrůst samostatná a
 - `cmd/skimtriage/` – Go nástroj pro evidenci triage: `pending` vypíše neohodnocené články, `save` zvaliduje a uloží hodnocení (vše, nebo nic).
 - `cmd/skimdigest/` – Go nástroj pro digest: `candidates` (ohodnocené články dne), `render` (zvaliduje příběhy od skillu a vykreslí markdown s odkazy z archivu), `feedback` (uloží 👍/👎 k příběhům).
 - `internal/` – sdílené Go balíčky: `feed` (parser RSS/Atom, HTML → text), `feedsfile` (čtení `feeds.yaml`), `store` (archiv a stav).
-- `data/articles/YYYY-MM-DD.jsonl` – archiv článků podle data stažení, jen append. `data/state.json` – co už je stažené, ETagy, selhání. `data/triage/YYYY-MM-DD.jsonl` – hodnocení článků (skóre 1–5 + důvod), den shodný se souborem článku. `data/digest/YYYY-MM-DD.md` (+ `.json`) – denní digest. `data/feedback.jsonl` – zpětná vazba k příběhům.
+- `data/articles/YYYY-MM-DD.jsonl` – archiv článků podle data stažení, jen append. `data/state.json` – co už je stažené, ETagy, selhání. `data/triage/YYYY-MM-DD.jsonl` – hodnocení článků (skóre 1–5 + důvod), den shodný se souborem článku. `data/digest/YYYY-MM-DD.md` (+ `.json`) – denní digest. `data/feedback.jsonl` – zpětná vazba k příběhům. `data/fulltext/YYYY-MM-DD.jsonl` – plný text stažený u kandidátů digestu. `data/proposals.jsonl` – kdy byly naposledy navrženy úpravy `topics.md`.
 - `docs/superpowers/` – návrhy a plány implementace.
 - `skills/` – skilly agenta (do `.claude/skills` připojené symlinkem).
 
@@ -38,5 +38,5 @@ parsování, ukládání). Z Go nástrojů později může vyrůst samostatná a
 - Ověření feedů: `go run ./cmd/feedcheck <url> [<url> ...]`
 - Stažení článků: `go run ./cmd/skimfetch [-topic <slug>] [-dry-run]`
 - Soubory v `data/articles/` nikdy nepřepisuj ani nemaž.
-- Triage: `go run ./cmd/skimtriage pending` / `go run ./cmd/skimtriage save < hodnoceni.jsonl`
-- Digest: `go run ./cmd/skimdigest candidates` / `render` / `feedback` (viz skill `skim-digest`)
+- Triage: `go run ./cmd/skimtriage pending` / `save` / `examples` (hlasy jako vodítko) / `report [-mark]` (návrh úprav témat)
+- Digest: `go run ./cmd/skimdigest fulltext` / `candidates` / `render` / `feedback` (viz skill `skim-digest`)

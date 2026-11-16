@@ -44,3 +44,19 @@ Zjisti stav:
 ## 5. Zpětná vazba
 
 Řeší ji skill **skim-digest** (krok 5) – vždy s `-day` dne digestu.
+
+## 6. Návrh úprav témat
+
+```
+go run ./cmd/skimtriage report
+```
+
+Když `due` je `true`:
+1. Z `by_feed`, `by_score`, `notes` a z `go run ./cmd/skimtriage examples`
+   najdi 1–3 jasné vzory (např. „r/golang: 6× 👎 u začátečnických dotazů“).
+2. Navrhni konkrétní úpravy polí **Zajímá mě / Nezajímá mě** v `topics.md`
+   s doložením (feed, počty, 2–3 titulky).
+3. Uprav `topics.md` jen po mém souhlasu.
+4. Pak vždy (i při odmítnutí) `go run ./cmd/skimtriage report -mark`.
+
+Když `due` je `false`, krok přeskoč a nic nevypisuj.

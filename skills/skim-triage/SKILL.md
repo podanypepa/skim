@@ -23,6 +23,9 @@ Buď přísný: pětek je málo, čtyřky musí mít skutečný obsah.
 ## Postup
 
 1. Přečti `topics.md` – u každého tématu pole **Zajímá mě**, **Nezajímá mě**, **Hloubka**.
+   Pak `go run ./cmd/skimtriage examples` – moje nedávné hlasy 👍/👎 k článkům
+   (nesoulady s tvým skóre jsou první). Ber je jako vodítko pro jemné
+   rozdíly; při rozporu s `topics.md` platí `topics.md`. Žádné hlasy → pokračuj.
 2. Vypiš dávku:
    ```
    go run ./cmd/skimtriage pending

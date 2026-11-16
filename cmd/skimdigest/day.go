@@ -9,7 +9,8 @@ import (
 // entry is an article of the day joined with its triage record (if any).
 type entry struct {
 	store.Article
-	Triage *store.Triage
+	Triage   *store.Triage
+	Fulltext *store.Fulltext
 }
 
 // dayData holds the articles of one day (first occurrence per id, file
@@ -44,6 +45,15 @@ func loadDay(dataDir, day string) (*dayData, error) {
 	for i := range recs {
 		if e, ok := d.ByID[recs[i].ID]; ok && e.Triage == nil {
 			e.Triage = &recs[i]
+		}
+	}
+	fts, err := store.ReadFulltext(dataDir, day)
+	if err != nil {
+		return nil, err
+	}
+	for i := range fts {
+		if e, ok := d.ByID[fts[i].ID]; ok && e.Fulltext == nil {
+			e.Fulltext = &fts[i]
 		}
 	}
 	return d, nil

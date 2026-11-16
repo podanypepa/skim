@@ -1,5 +1,8 @@
 # skim
 
+[![CI](https://github.com/podanypepa/skim/actions/workflows/ci.yml/badge.svg)](https://github.com/podanypepa/skim/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **A personal RSS agent that reads the feeds for you and hands you a short daily digest.**
 
 skim is a replacement for scrolling through hundreds of headlines in a
@@ -76,14 +79,25 @@ data/articles/     data/triage/            data/digest/D.md
    batches of untriaged articles; `skimtriage save` validates the batch
    (known ids, integer scores, reason length…) and writes it **all or
    nothing**.
-3. **Digest** — the `skim-digest` skill groups the best candidates into
+3. **Full text** — many feeds only carry a teaser (or nothing). Before
+   the digest, `skimdigest fulltext` fetches the article page for
+   candidates with short content, extracts the readable text and stores
+   it, so summaries have real substance. It honours robots.txt (RFC 9309,
+   including every redirect hop), only connects to public addresses, and
+   tries each page once — transient failures (network, 429, 5xx) are
+   retried on the next run. Sites that block bots (e.g. Reddit) keep their
+   feed excerpt.
+4. **Digest** — the `skim-digest` skill groups the best candidates into
    stories and writes the summaries. `skimdigest render` validates the
    structure and renders the markdown from a fixed template. **Links,
    feed names and article titles always come from the archive, never from
    the model**, so they cannot be hallucinated or mistyped.
-4. **Feedback** — tell it in chat which stories were good or bad;
-   `skimdigest feedback` maps story numbers back to article ids and stores
-   the votes for later tuning.
+5. **Feedback & learning** — tell it in chat which stories were good or
+   bad; `skimdigest feedback` maps story numbers back to article ids.
+   Triage reads your recent votes as examples (`skimtriage examples`,
+   disagreements first), and about once a week (`skimtriage report`)
+   `skim` proposes concrete edits to `topics.md`, backed by vote counts —
+   applied only if you agree. `topics.md` always wins over examples.
 
 The `skim` skill runs all of this in one go.
 
@@ -177,11 +191,14 @@ go run ./cmd/feedcheck https://go.dev/blog https://simonwillison.net
 # Fetch new articles (all feeds, one topic, or a dry run)
 go run ./cmd/skimfetch [-topic golang] [-dry-run] [-backfill-days 7]
 
-# Triage bookkeeping
+# Triage bookkeeping and feedback learning
 go run ./cmd/skimtriage pending [-limit 25] [-days 7] [-topic slug]
 go run ./cmd/skimtriage save < scores.jsonl
+go run ./cmd/skimtriage examples [-n 30]
+go run ./cmd/skimtriage report [-mark]
 
 # Digest
+go run ./cmd/skimdigest fulltext   [-day …] [-min 3] [-short 600]
 go run ./cmd/skimdigest candidates [-day 2026-11-16] [-min 3]
 go run ./cmd/skimdigest render     [-day …] [-force] < digest.json
 go run ./cmd/skimdigest feedback    -day …           < feedback.jsonl
@@ -197,7 +214,9 @@ Everything lives in plain files under `data/` (git-ignored):
 | `data/state.json` | Per-feed fetch state: ETag, Last-Modified, failures, seen ids |
 | `data/triage/YYYY-MM-DD.jsonl` | Scores and reasons, same day as the article file |
 | `data/digest/YYYY-MM-DD.md` / `.json` | The rendered digest and its structured form |
+| `data/fulltext/YYYY-MM-DD.jsonl` | Article text fetched from the web for digest candidates |
 | `data/feedback.jsonl` | Your votes on digest stories |
+| `data/proposals.jsonl` | When `topics.md` edits were last proposed |
 
 Article and triage files are **append-only**; nothing is ever rewritten.
 Plain JSONL means you can `grep`, `jq` or open everything in an editor.
@@ -251,8 +270,7 @@ conventions for agents are in `CLAUDE.md`.
 
 Working and used daily by the author. Possible next steps:
 
-- learn from feedback (feed votes back into triage),
-- a web page view of the digest,
+- a web page view of the digest (with 👍/👎 buttons),
 - scheduled runs.
 
 The project documentation for agents (`CLAUDE.md`, skills) is written in

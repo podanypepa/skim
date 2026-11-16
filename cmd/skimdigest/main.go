@@ -5,6 +5,7 @@
 //
 // Usage:
 //
+//	go run ./cmd/skimdigest fulltext   [-day D] [-min 3] [-short 600] [-data data]
 //	go run ./cmd/skimdigest candidates [-day D] [-min 3] [-excerpt 2000] [-data data]
 //	go run ./cmd/skimdigest render     [-day D] [-force] [-data data] < digest.json
 //	go run ./cmd/skimdigest feedback   [-day D] [-data data] < feedback.jsonl
@@ -36,6 +37,9 @@ func main() {
 	case "render":
 		fs.BoolVar(&force, "force", false, "overwrite an existing digest")
 	case "feedback":
+	case "fulltext":
+		fs.IntVar(&minScore, "min", 3, "minimum triage score")
+		fs.IntVar(&excerpt, "short", 600, "fetch full text when feed content is shorter than this (characters)")
 	default:
 		usage()
 	}
@@ -52,6 +56,9 @@ func main() {
 			err = runRender(*dataDir, *day, force, os.Stdin, os.Stdout)
 		case "feedback":
 			err = runFeedback(*dataDir, *day, os.Stdin, time.Now(), os.Stdout)
+		case "fulltext":
+			err = runFulltext(FulltextOptions{DataDir: *dataDir, Day: *day, Min: minScore, Short: excerpt,
+				Client: newSafeClient(), Now: time.Now()}, os.Stdout)
 		}
 	}
 	if err != nil {
@@ -61,6 +68,6 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: skimdigest candidates|render|feedback [flags]")
+	fmt.Fprintln(os.Stderr, "usage: skimdigest fulltext|candidates|render|feedback [flags]")
 	os.Exit(2)
 }
