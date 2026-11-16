@@ -79,7 +79,14 @@ h2.topic {
 .summary p { margin: 8px 0 0; max-width: 65ch; }
 .sources { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 4px; font-size: 0.88rem; }
 .sources li { min-width: 0; overflow-wrap: anywhere; }
-.sources .feed { color: var(--muted); }
+.sources .feed, details.more .feed { color: var(--muted); }
+.copy {
+  display: inline-flex; align-items: center; justify-content: center; vertical-align: -3px;
+  margin-left: 4px; padding: 3px; border: 0; border-radius: 6px; background: transparent;
+  color: var(--muted); cursor: pointer;
+}
+.copy:hover { color: var(--accent); background: var(--accent-soft); }
+.copy.done { color: var(--up); }
 .votes { display: flex; gap: 6px; margin-top: 12px; align-items: center; }
 .votes button {
   font: 500 0.85rem var(--font-body); background: transparent; color: var(--muted);
@@ -145,12 +152,53 @@ details.more li { overflow-wrap: anywhere; }
     return v && (!v.title || v.title === story.title) ? v : null;
   }
 
+  const SVG = "http://www.w3.org/2000/svg";
+  function icon(paths) {
+    const s = document.createElementNS(SVG, "svg");
+    s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("width", "15"); s.setAttribute("height", "15");
+    s.setAttribute("aria-hidden", "true");
+    for (const d of paths) {
+      const p = document.createElementNS(SVG, "path");
+      p.setAttribute("d", d); p.setAttribute("fill", "none"); p.setAttribute("stroke", "currentColor");
+      p.setAttribute("stroke-width", "2"); p.setAttribute("stroke-linecap", "round"); p.setAttribute("stroke-linejoin", "round");
+      s.append(p);
+    }
+    return s;
+  }
+  const COPY_ICON = ["M9 9h10v10H9z", "M5 15V5h10"];
+  const DONE_ICON = ["M5 12l4 4L19 7"];
+
+  // Copy button after a link; falls back to selecting the link text when
+  // the clipboard is refused.
+  function copyButton(url, a) {
+    const b = el("button", "copy");
+    b.type = "button";
+    b.title = "Zkopírovat odkaz";
+    b.setAttribute("aria-label", "Zkopírovat odkaz");
+    b.append(icon(COPY_ICON));
+    b.addEventListener("click", () => {
+      const done = () => {
+        b.replaceChildren(icon(DONE_ICON));
+        b.classList.add("done");
+        b.setAttribute("aria-label", "Zkopírováno");
+        setTimeout(() => { b.replaceChildren(icon(COPY_ICON)); b.classList.remove("done"); b.setAttribute("aria-label", "Zkopírovat odkaz"); }, 1500);
+      };
+      const select = () => { const r = document.createRange(); r.selectNodeContents(a); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); };
+      try {
+        navigator.clipboard.writeText(url).then(done, select);
+      } catch { select(); }
+    });
+    return b;
+  }
+
   function link(text, url) {
     const safe = safeURL(url);
     if (!safe) return el("span", "", text);
     const a = el("a", "", text);
     a.href = safe; a.target = "_blank"; a.rel = "noopener noreferrer";
-    return a;
+    const wrap = el("span", "lnk");
+    wrap.append(a, copyButton(safe, a));
+    return wrap;
   }
 
   function voteRow(day, story) {
