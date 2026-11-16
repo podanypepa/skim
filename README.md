@@ -172,6 +172,25 @@ its data file. Votes are stored in the page's own database and imported
 into `data/feedback.jsonl` on the next `skim` run, where triage learns
 from them.
 
+#### Reading it on your phone
+
+The page is a private claude.ai artifact, so it opens wherever you are
+signed in to the same Claude account:
+
+1. Run `skim` once on your computer — it publishes the page and prints its
+   link (also saved in `data/web/artifact-url`). The link never changes;
+   every run updates the same page.
+2. On the phone, open that link in the **Claude app** or in a mobile
+   browser signed in to the same account. Without signing in the page
+   won't open — it is private unless you share it from its Share menu.
+3. Find it again any time in your artifacts on claude.ai; `skim` can also
+   pin it to the claude.ai sidebar.
+4. For one-tap access, open the link in Safari or Chrome and choose
+   **Share → Add to Home Screen**.
+
+Votes you give on the phone are imported the next time `skim` runs on
+your computer.
+
 <p align="center">
   <img src="docs/images/digest-page-light.png" alt="Digest page on desktop in light mode: topic chips, story cards with score, summary, sources and vote buttons" width="68%">
   &nbsp;
