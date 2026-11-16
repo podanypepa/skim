@@ -13,6 +13,7 @@
 package digest
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -53,8 +54,8 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stderr, usageText)
 		return 2
 	}
-	if fs.Parse(args[1:]) != nil {
-		return 2
+	if err := fs.Parse(args[1:]); err != nil {
+		return parseExit(err)
 	}
 
 	var err error
@@ -84,4 +85,13 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		return 1
 	}
 	return 0
+}
+
+// parseExit maps a flag parsing error to an exit code: -h/-help is 0
+// (as with flag.ExitOnError), anything else 2.
+func parseExit(err error) int {
+	if errors.Is(err, flag.ErrHelp) {
+		return 0
+	}
+	return 2
 }

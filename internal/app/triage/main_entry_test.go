@@ -19,3 +19,10 @@ func TestMainErrorExitCode(t *testing.T) {
 		t.Fatalf("ok path code=%d out=%q", code, out.String())
 	}
 }
+
+func TestMainHelpExitsZero(t *testing.T) {
+	var out, errb bytes.Buffer
+	if code := Main([]string{"pending", "-h"}, strings.NewReader(""), &out, &errb); code != 0 {
+		t.Fatalf("-h code=%d", code)
+	}
+}

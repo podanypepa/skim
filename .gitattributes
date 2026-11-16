@@ -1,0 +1,3 @@
+# Keep the bash wrapper runnable on Windows (git-bash) checkouts.
+skim text eol=lf
+*.sh text eol=lf

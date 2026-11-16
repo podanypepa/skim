@@ -12,7 +12,7 @@ parsování, ukládání). Z Go nástrojů později může vyrůst samostatná a
 
 - `topics.md` – témata, která mě zajímají, a co v nich chci / nechci. Zdroj pravdy pro výběr zdrojů i třídění článků.
 - `feeds.yaml` – odebírané feedy. Přidávají se jen po mém schválení.
-- `cmd/skim/` – jeden program `skim` se všemi nástroji (`check`, `fetch`, `triage …`, `digest …`, `version`). Spouští se přes `./skim` (použije nainstalovanou binárku, jinak `go run ./cmd/skim`).
+- `cmd/skim/` – jeden program `skim` se všemi nástroji (`check`, `fetch`, `triage …`, `digest …`, `version`). Spouští se přes `./skim` (s Go spustí kód z repa přes `go run ./cmd/skim`, bez Go nainstalovanou binárku).
   - `skim check` – ověří RSS/Atom feed (nebo ho najde z URL webu), JSONL se stavem, frekvencí a ukázkou titulků.
   - `skim fetch` – stáhne nové články do `data/` (bez duplicit, podmíněný GET), JSONL souhrn.
   - `skim triage` – evidence triage: `pending`, `save` (vše, nebo nic), `examples`, `report`.

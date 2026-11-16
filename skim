@@ -1,20 +1,40 @@
 #!/usr/bin/env bash
-# Runs the skim tools: an installed `skim` binary if there is one,
-# otherwise `go run ./cmd/skim`. Skills call this script.
+# Runs the skim tools for the skills.
+#   - Go available  → `go run ./cmd/skim` (always the code in this repo)
+#   - otherwise     → an installed `skim` binary on PATH
+#   - neither       → explain what to install (exit 127)
+# Relative paths in arguments (-feeds, -data) are resolved from the repo
+# root, where the skills run.
 set -euo pipefail
-here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-self="$here/$(basename "${BASH_SOURCE[0]}")"
+
+# Resolve this script through symlinks (no `readlink -f` on older macOS).
+src="${BASH_SOURCE[0]}"
+while [ -L "$src" ]; do
+  dir="$(cd -P "$(dirname "$src")" && pwd)"
+  src="$(readlink "$src")"
+  case "$src" in /*) ;; *) src="$dir/$src" ;; esac
+done
+here="$(cd -P "$(dirname "$src")" && pwd)"
+self="$here/$(basename "$src")"
 cd "$here"
 
+if command -v go >/dev/null 2>&1 && [ -f go.mod ]; then
+  exec go run ./cmd/skim "$@"
+fi
+
 if bin="$(command -v skim 2>/dev/null)"; then
-  # Skip ourselves (when the repo directory is on PATH).
-  real_bin="$(cd "$(dirname "$bin")" && pwd)/$(basename "$bin")"
-  if [ "$real_bin" != "$self" ]; then
+  # Resolve the PATH entry too, and skip it when it is this wrapper.
+  b="$bin"
+  while [ -L "$b" ]; do
+    d="$(cd -P "$(dirname "$b")" && pwd)"
+    b="$(readlink "$b")"
+    case "$b" in /*) ;; *) b="$d/$b" ;; esac
+  done
+  b="$(cd -P "$(dirname "$b")" && pwd)/$(basename "$b")"
+  if [ "$b" != "$self" ]; then
     exec "$bin" "$@"
   fi
 fi
-if command -v go >/dev/null 2>&1; then
-  exec go run ./cmd/skim "$@"
-fi
+
 echo "skim: install the skim binary (see README → Install) or Go 1.24+" >&2
 exit 127

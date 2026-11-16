@@ -14,6 +14,7 @@
 package triage
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -43,31 +44,31 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		fs.IntVar(&o.Limit, "limit", 25, "max articles to print")
 		fs.IntVar(&o.Days, "days", 7, "only articles fetched in the last N days")
 		fs.IntVar(&o.Excerpt, "excerpt", 1500, "excerpt length in characters")
-		if fs.Parse(args[1:]) != nil {
-			return 2
+		if err := fs.Parse(args[1:]); err != nil {
+			return parseExit(err)
 		}
 		err = runPending(o, stdout)
 	case "save":
 		fs := newFS("save")
 		dataDir := fs.String("data", "data", "data directory")
-		if fs.Parse(args[1:]) != nil {
-			return 2
+		if err := fs.Parse(args[1:]); err != nil {
+			return parseExit(err)
 		}
 		err = runSave(*dataDir, stdin, time.Now(), stdout)
 	case "examples":
 		fs := newFS("examples")
 		dataDir := fs.String("data", "data", "data directory")
 		n := fs.Int("n", 30, "max examples")
-		if fs.Parse(args[1:]) != nil {
-			return 2
+		if err := fs.Parse(args[1:]); err != nil {
+			return parseExit(err)
 		}
 		err = runExamples(*dataDir, *n, stdout)
 	case "report":
 		fs := newFS("report")
 		dataDir := fs.String("data", "data", "data directory")
 		mark := fs.Bool("mark", false, "record that a topics.md proposal was made")
-		if fs.Parse(args[1:]) != nil {
-			return 2
+		if err := fs.Parse(args[1:]); err != nil {
+			return parseExit(err)
 		}
 		err = runReport(*dataDir, *mark, time.Now(), stdout)
 	default:
@@ -79,4 +80,13 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 		return 1
 	}
 	return 0
+}
+
+// parseExit maps a flag parsing error to an exit code: -h/-help is 0
+// (as with flag.ExitOnError), anything else 2.
+func parseExit(err error) int {
+	if errors.Is(err, flag.ErrHelp) {
+		return 0
+	}
+	return 2
 }

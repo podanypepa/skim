@@ -45,6 +45,7 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
         run: |
-          gh release create "${{ github.ref_name }}" dist/*.tar.gz dist/*.zip dist/SHA256SUMS \
-            --title "${{ github.ref_name }}" --generate-notes
+          gh release create "$TAG" dist/*.tar.gz dist/*.zip dist/SHA256SUMS \
+            --title "$TAG" --generate-notes

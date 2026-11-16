@@ -130,13 +130,16 @@ git clone https://github.com/podanypepa/skim.git
 cd skim
 ```
 
-The skills run the tools through `./skim`, which uses an installed `skim`
-binary when there is one and falls back to `go run ./cmd/skim`. Pick one:
+The skills run the tools through `./skim`: with Go installed it runs the
+code in the repo (`go run ./cmd/skim`, always in sync after `git pull`),
+otherwise it uses a `skim` binary from your `PATH`. Pick one:
 
 - **No Go needed:** download the archive for your system from
   [Releases](https://github.com/podanypepa/skim/releases) (macOS Intel /
   Apple Silicon, Linux, Windows), check it against `SHA256SUMS` and put the
-  `skim` binary on your `PATH`.
+  `skim` binary on your `PATH`. Update it after a `git pull` that brings a
+  new release. On macOS the binary is unsigned: if it is blocked, run
+  `xattr -d com.apple.quarantine skim`.
 - **With Go 1.24+:** `go install github.com/podanypepa/skim/cmd/skim@latest`.
 - **Or nothing:** with Go installed, `./skim` just works from the repo.
 

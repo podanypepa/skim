@@ -11,6 +11,7 @@ package fetch
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -74,7 +75,7 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) int {
 	fs.IntVar(&opts.BackfillDays, "backfill-days", 7, "on a feed's first fetch, keep only items newer than this")
 	fs.BoolVar(&opts.DryRun, "dry-run", false, "fetch and report, but write nothing")
 	if err := fs.Parse(args); err != nil {
-		return 2
+		return parseExit(err)
 	}
 	opts.Now = time.Now()
 
@@ -295,4 +296,13 @@ func resolve(base *url.URL, link string) string {
 		return link
 	}
 	return base.ResolveReference(u).String()
+}
+
+// parseExit maps a flag parsing error to an exit code: -h/-help is 0
+// (as with flag.ExitOnError), anything else 2.
+func parseExit(err error) int {
+	if errors.Is(err, flag.ErrHelp) {
+		return 0
+	}
+	return 2
 }
