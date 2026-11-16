@@ -14,7 +14,10 @@ import (
 
 // Days returns the dates (YYYY-MM-DD) of dataDir/<sub>/*.jsonl, ascending.
 // A missing directory yields no days.
-func Days(dataDir, sub string) ([]string, error) {
+func Days(dataDir, sub string) ([]string, error) { return DaysExt(dataDir, sub, ".jsonl") }
+
+// DaysExt is Days for files with the given extension (e.g. ".json").
+func DaysExt(dataDir, sub, ext string) ([]string, error) {
 	entries, err := os.ReadDir(filepath.Join(dataDir, sub))
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil, nil
@@ -24,7 +27,7 @@ func Days(dataDir, sub string) ([]string, error) {
 	}
 	var days []string
 	for _, e := range entries {
-		day, ok := strings.CutSuffix(e.Name(), ".jsonl")
+		day, ok := strings.CutSuffix(e.Name(), ext)
 		if !ok || e.IsDir() {
 			continue
 		}

@@ -74,6 +74,9 @@ Ukaž:
 
 ## 5. Zpětná vazba
 
+Hlasy jdou dát i tlačítky 👍/👎 na stránce s digestem (viz skill `skim`,
+krok 0 – převezmou se při dalším běhu). Z chatu:
+
 Když napíšu hodnocení příběhů (čísla + dobrý/špatný, případně poznámku),
 zapiš je – jeden řádek na příběh. **Vždy uveď `-day`** dne digestu, o kterém
 mluvíme (čísla příběhů platí jen pro daný den):

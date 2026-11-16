@@ -104,3 +104,19 @@ func TestFeedbackEchoesDayAndTitles(t *testing.T) {
 		t.Fatalf("out = %s", out)
 	}
 }
+
+func TestFeedbackTitleCheck(t *testing.T) {
+	dir := withDigest(t)
+	if _, err := feedback(dir, `{"story":2,"vote":"up","title":"Příběh dva"}`); err != nil {
+		t.Fatalf("matching title: %v", err)
+	}
+	if _, err := feedback(dir, `{"story":1,"vote":"down","title":"Jiný příběh"}`); err == nil || !strings.Contains(err.Error(), "řádek 1") {
+		t.Fatalf("mismatch err = %v", err)
+	}
+	if len(readFeedback(t, dir)) != 1 {
+		t.Fatal("mismatched vote written")
+	}
+	if _, err := feedback(dir, `{"story":1,"vote":"down"}`); err != nil {
+		t.Fatalf("no title: %v", err)
+	}
+}

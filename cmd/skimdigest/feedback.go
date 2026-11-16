@@ -23,6 +23,7 @@ type feedbackInput struct {
 	Story int    `json:"story"`
 	Vote  string `json:"vote"`
 	Note  string `json:"note"`
+	Title string `json:"title"` // optional: must match the story title (guards against a re-rendered digest)
 }
 
 // runFeedback maps story numbers of the day's digest to article ids and
@@ -73,6 +74,8 @@ func runFeedback(dataDir, day string, in io.Reader, now time.Time, out io.Writer
 		s, ok := stories[f.Story]
 		if !ok {
 			bad("příběh %d v digestu za %s není", f.Story, day)
+		} else if f.Title != "" && f.Title != s.Title {
+			bad("titulek nesedí: příběh %d je teď %q", f.Story, s.Title)
 		}
 		if f.Vote != "up" && f.Vote != "down" {
 			bad("vote musí být \"up\" nebo \"down\", je %q", f.Vote)

@@ -158,8 +158,25 @@ example. Make them yours:
 ```
 
 That's it. It fetches, triages, builds today's digest (or refreshes it if
-something new and important arrived) and shows it in chat. The full
-digest is saved to `data/digest/YYYY-MM-DD.md`.
+something new and important arrived), publishes the digest page and shows
+a short version in chat. The full digest is also saved to
+`data/digest/YYYY-MM-DD.md`.
+
+### The digest page
+
+`skim` keeps one private page on claude.ai (an artifact) with a stable
+link: the latest digest on top, the last 14 days a tap away, topics as
+sections and 👍/👎 on every story. It reads well on a phone, in light and
+dark mode. The template is `web/digest.html`; `skimdigest export` writes
+its data file. Votes are stored in the page's own database and imported
+into `data/feedback.jsonl` on the next `skim` run, where triage learns
+from them.
+
+<p align="center">
+  <img src="docs/images/digest-page-light.png" alt="Digest page on desktop in light mode: topic chips, story cards with score, summary, sources and vote buttons" width="68%">
+  &nbsp;
+  <img src="docs/images/digest-page-mobile-dark.png" alt="Digest page on a phone in dark mode" width="26%">
+</p>
 
 Give feedback in plain words:
 
@@ -198,6 +215,7 @@ go run ./cmd/skimtriage examples [-n 30]
 go run ./cmd/skimtriage report [-mark]
 
 # Digest
+go run ./cmd/skimdigest export     [-days 14]   # data for the digest page
 go run ./cmd/skimdigest fulltext   [-day …] [-min 3] [-short 600]
 go run ./cmd/skimdigest candidates [-day 2026-11-16] [-min 3]
 go run ./cmd/skimdigest render     [-day …] [-force] < digest.json
@@ -217,6 +235,7 @@ Everything lives in plain files under `data/` (git-ignored):
 | `data/fulltext/YYYY-MM-DD.jsonl` | Article text fetched from the web for digest candidates |
 | `data/feedback.jsonl` | Your votes on digest stories |
 | `data/proposals.jsonl` | When `topics.md` edits were last proposed |
+| `data/web/` | Digest page data (`digests.json`) and the page's URL |
 
 Article and triage files are **append-only**; nothing is ever rewritten.
 Plain JSONL means you can `grep`, `jq` or open everything in an editor.
@@ -249,6 +268,7 @@ internal/
   feedsfile/     feeds.yaml reader
   store/         archive, state, triage and feedback storage
 skills/          Claude Code skills (symlinked as .claude/skills)
+web/             digest page template (published as a claude.ai artifact)
 docs/superpowers/ design specs and implementation plans
 topics.md        your interests — source of truth for discovery and triage
 feeds.yaml       subscribed feeds
@@ -270,7 +290,6 @@ conventions for agents are in `CLAUDE.md`.
 
 Working and used daily by the author. Possible next steps:
 
-- a web page view of the digest (with 👍/👎 buttons),
 - scheduled runs.
 
 The project documentation for agents (`CLAUDE.md`, skills) is written in

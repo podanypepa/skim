@@ -5,6 +5,7 @@
 //
 // Usage:
 //
+//	go run ./cmd/skimdigest export     [-days 14] [-data data]  → data/web/digests.json
 //	go run ./cmd/skimdigest fulltext   [-day D] [-min 3] [-short 600] [-data data]
 //	go run ./cmd/skimdigest candidates [-day D] [-min 3] [-excerpt 2000] [-data data]
 //	go run ./cmd/skimdigest render     [-day D] [-force] [-data data] < digest.json
@@ -15,6 +16,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -37,6 +39,8 @@ func main() {
 	case "render":
 		fs.BoolVar(&force, "force", false, "overwrite an existing digest")
 	case "feedback":
+	case "export":
+		fs.IntVar(&minScore, "days", 14, "how many days of digests to export")
 	case "fulltext":
 		fs.IntVar(&minScore, "min", 3, "minimum triage score")
 		fs.IntVar(&excerpt, "short", 600, "fetch full text when feed content is shorter than this (characters)")
@@ -56,6 +60,12 @@ func main() {
 			err = runRender(*dataDir, *day, force, os.Stdin, os.Stdout)
 		case "feedback":
 			err = runFeedback(*dataDir, *day, os.Stdin, time.Now(), os.Stdout)
+		case "export":
+			out := filepath.Join(*dataDir, "web", "digests.json")
+			err = runExport(*dataDir, minScore, out, time.Now())
+			if err == nil {
+				fmt.Println(out)
+			}
 		case "fulltext":
 			err = runFulltext(FulltextOptions{DataDir: *dataDir, Day: *day, Min: minScore, Short: excerpt,
 				Client: newSafeClient(), Now: time.Now()}, os.Stdout)
@@ -68,6 +78,6 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "usage: skimdigest fulltext|candidates|render|feedback [flags]")
+	fmt.Fprintln(os.Stderr, "usage: skimdigest fulltext|candidates|render|feedback|export [flags]")
 	os.Exit(2)
 }

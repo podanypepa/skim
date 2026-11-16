@@ -1,0 +1,319 @@
+<title>Skim</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column (≈ 44rem); sticky day bar; topics as sections, stories as cards. */
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --fg: #16191f;
+  --muted: #5b6372;
+  --line: #dde1e8;
+  --accent: #1f5fbf;
+  --accent-soft: #e4ecfa;
+  --hot: #b4511f;
+  --hot-soft: #fbeae0;
+  --up: #1d7a4a;
+  --down: #a3322b;
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1216; --surface: #171b21; --fg: #e7eaef; --muted: #9aa3b2; --line: #2a303a;
+    --accent: #7aa7f0; --accent-soft: #1c2a42; --hot: #f0a072; --hot-soft: #3a2418;
+    --up: #5cc78f; --down: #f0857c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1216; --surface: #171b21; --fg: #e7eaef; --muted: #9aa3b2; --line: #2a303a;
+  --accent: #7aa7f0; --accent-soft: #1c2a42; --hot: #f0a072; --hot-soft: #3a2418;
+  --up: #5cc78f; --down: #f0857c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font: 15px/1.6 var(--font-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 44rem; margin: 0 auto; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-block: 14px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.brand { font: 700 1.35rem/1 var(--font-display); letter-spacing: -0.01em; margin: 0; }
+.day { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.day button, .day select {
+  font: 500 0.9rem var(--font-body); color: var(--fg); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer;
+}
+.day button:disabled { opacity: 0.4; cursor: default; }
+.meta { width: 100%; color: var(--muted); font-size: 0.85rem; }
+.topics { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.topics a {
+  text-decoration: none; font: 500 0.8rem var(--font-body); color: var(--accent);
+  background: var(--accent-soft); border-radius: 999px; padding: 3px 10px;
+}
+
+h2.topic {
+  font: 600 0.78rem var(--font-body); text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); margin: 32px 0 10px; scroll-margin-top: 120px;
+}
+.stories { display: grid; gap: 12px; }
+.story { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; min-width: 0; }
+.story header { display: flex; align-items: baseline; gap: 10px; }
+.num { font: 500 0.85rem var(--font-data); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 1.6em; }
+.story h3 { font: 600 1.12rem/1.3 var(--font-display); margin: 0; flex: 1; min-width: 0; text-wrap: balance; }
+.score {
+  font: 500 0.72rem var(--font-data); padding: 2px 7px; border-radius: 6px;
+  color: var(--accent); background: var(--accent-soft); white-space: nowrap;
+}
+.score.s5 { color: var(--hot); background: var(--hot-soft); }
+.summary p { margin: 8px 0 0; max-width: 65ch; }
+.sources { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 4px; font-size: 0.88rem; }
+.sources li { min-width: 0; overflow-wrap: anywhere; }
+.sources .feed { color: var(--muted); }
+.votes { display: flex; gap: 6px; margin-top: 12px; align-items: center; }
+.votes button {
+  font: 500 0.85rem var(--font-body); background: transparent; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer;
+}
+.votes button[aria-pressed="true"].up { color: var(--up); border-color: var(--up); }
+.votes button[aria-pressed="true"].down { color: var(--down); border-color: var(--down); }
+.votes .note { color: var(--muted); font-size: 0.78rem; }
+
+details.more { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 12px; }
+details.more summary { cursor: pointer; font: 600 0.95rem var(--font-display); }
+details.more ul { padding-left: 1.1em; margin: 10px 0 0; display: grid; gap: 6px; font-size: 0.9rem; }
+details.more li { overflow-wrap: anywhere; }
+
+.state { margin-top: 48px; color: var(--muted); text-align: center; }
+.state strong { display: block; color: var(--fg); font: 600 1.1rem var(--font-display); margin-bottom: 6px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <div class="bar">
+    <h1 class="brand">Skim</h1>
+    <div class="day" id="day-nav" hidden>
+      <button type="button" id="prev" aria-label="Starší den">‹</button>
+      <select id="day-select" aria-label="Den digestu"></select>
+      <button type="button" id="next" aria-label="Novější den">›</button>
+    </div>
+    <div class="meta" id="meta"></div>
+    <nav class="topics" id="topics" aria-label="Témata"></nav>
+  </div>
+  <main id="content">
+    <div class="state" id="loading"><strong>Načítám digest…</strong>Data se stahují z přiloženého souboru.</div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  };
+  const safeURL = (u) => (typeof u === "string" && /^https?:\/\//i.test(u)) ? u : null;
+  const czDate = (d) => { const [y, m, day] = d.split("-").map(Number); return day + ". " + m + ". " + y; };
+  const plural = (n, one, few, many) => n === 1 ? one : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? few : many;
+  const slug = (s) => "t-" + String(s).toLowerCase().replace(/[^a-z0-9-]+/g, "-");
+
+  let days = [];
+  let idx = 0;
+  let votes = {};        // "<day>_<n>" -> {vote, imported, title}
+  let db = null;
+  let votesReady = false;
+  let votesSlow = false; // first snapshot is late: show a note, keep listening
+  const pending = new Set();
+  const failed = new Set();
+
+  // A vote belongs to a story only while its title matches: after a digest
+  // is rebuilt, story numbers can point to different stories.
+  function voteFor(day, story) {
+    const v = votes[day + "_" + story.n];
+    return v && (!v.title || v.title === story.title) ? v : null;
+  }
+
+  function link(text, url) {
+    const safe = safeURL(url);
+    if (!safe) return el("span", "", text);
+    const a = el("a", "", text);
+    a.href = safe; a.target = "_blank"; a.rel = "noopener noreferrer";
+    return a;
+  }
+
+  function voteRow(day, story) {
+    const row = el("div", "votes");
+    const key = day + "_" + story.n;
+    const cur = voteFor(day, story);
+    for (const [v, label, cls] of [["up", "👍 Dobrý", "up"], ["down", "👎 Nezajímavé", "down"]]) {
+      const b = el("button", cls, label);
+      b.type = "button";
+      b.setAttribute("aria-pressed", cur && cur.vote === v ? "true" : "false");
+      b.disabled = pending.has(key);
+      b.addEventListener("click", () => castVote(day, story, v));
+      row.append(b);
+    }
+    if (failed.has(key)) row.append(el("span", "note", "Hlas se nepodařilo uložit, zkus to znovu."));
+    else if (cur && cur.imported === true) row.append(el("span", "note", "převzato do učení"));
+    return row;
+  }
+
+  async function castVote(day, story, v) {
+    if (!db) return;
+    const key = day + "_" + story.n;
+    if (pending.has(key)) return;
+    const cur = voteFor(day, story);
+    pending.add(key); failed.delete(key); render();
+    try {
+      const ref = db.collection("votes").doc(key);
+      if (cur && cur.vote === v && cur.imported !== true) {
+        await ref.delete();
+      } else if (!cur || cur.vote !== v) {
+        await ref.set({ day, story: story.n, title: story.title, vote: v, at: new Date().toISOString(), imported: false });
+      }
+    } catch (e) {
+      failed.add(key);
+      console.warn("vote failed", e);
+    } finally {
+      pending.delete(key); render();
+    }
+  }
+
+  function render() {
+    const content = $("content");
+    content.replaceChildren();
+    $("topics").replaceChildren();
+    if (!days.length) {
+      const s = el("div", "state");
+      s.append(el("strong", "", "Zatím tu není žádný digest"), document.createTextNode("Spusť v Claude Code „skim“ a stránka se naplní."));
+      content.append(s);
+      $("meta").textContent = "";
+      return;
+    }
+    const d = days[idx];
+    $("day-nav").hidden = false;
+    $("day-select").value = d.day;
+    $("prev").disabled = idx >= days.length - 1;
+    $("next").disabled = idx <= 0;
+
+    const articles = d.stories.reduce((n, s) => n + s.articles.length, 0) + d.more.length;
+    $("meta").textContent = czDate(d.day) + " · " + d.stories.length + " " + plural(d.stories.length, "příběh", "příběhy", "příběhů") +
+      " z " + articles + " " + (articles === 1 ? "článku" : "článků") +
+      (db && votesSlow && !votesReady ? " · hlasy se zatím nepodařilo načíst" : "");
+
+    const topics = [];
+    for (const s of d.stories) if (!topics.includes(s.topic)) topics.push(s.topic);
+    for (const t of topics) {
+      const a = el("a", "", t + " " + d.stories.filter((s) => s.topic === t).length);
+      a.href = "#" + slug(t);
+      $("topics").append(a);
+    }
+
+    for (const t of topics) {
+      const h = el("h2", "topic", t);
+      h.id = slug(t);
+      content.append(h);
+      const list = el("div", "stories");
+      for (const s of d.stories.filter((x) => x.topic === t)) {
+        const card = el("article", "story");
+        const head = el("header");
+        head.append(el("span", "num", String(s.n)), el("h3", "", s.title), el("span", "score" + (s.score >= 5 ? " s5" : ""), "skóre " + s.score));
+        card.append(head);
+        const sum = el("div", "summary");
+        for (const para of String(s.summary).split(/\n{2,}/)) sum.append(el("p", "", para));
+        card.append(sum);
+        const src = el("ul", "sources");
+        for (const a of s.articles) {
+          const li = el("li");
+          li.append(link(a.title, a.url), el("span", "feed", " · " + a.feed_title));
+          src.append(li);
+        }
+        card.append(src);
+        if (db && votesReady) card.append(voteRow(d.day, s));
+        list.append(card);
+      }
+      content.append(list);
+    }
+
+    if (d.more.length) {
+      const det = el("details", "more");
+      det.append(el("summary", "", "Další zprávy (" + d.more.length + ")"));
+      const ul = el("ul");
+      for (const a of d.more) {
+        const li = el("li");
+        li.append(link(a.title, a.url), el("span", "feed", " · " + a.feed_title));
+        ul.append(li);
+      }
+      det.append(ul);
+      content.append(det);
+    }
+  }
+
+  function selectDay(i) {
+    idx = Math.max(0, Math.min(days.length - 1, i));
+    history.replaceState(null, "", "#d-" + days[idx].day);
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  $("prev").addEventListener("click", () => selectDay(idx + 1));
+  $("next").addEventListener("click", () => selectDay(idx - 1));
+  $("day-select").addEventListener("change", (e) => selectDay(days.findIndex((d) => d.day === e.target.value)));
+  window.addEventListener("hashchange", () => {
+    const m = location.hash.match(/^#d-(\d{4}-\d{2}-\d{2})$/);
+    const i = m ? days.findIndex((d) => d.day === m[1]) : -1;
+    if (i >= 0 && i !== idx) { idx = i; render(); }
+  });
+
+  fetch("digests.json", { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then((data) => {
+      days = Array.isArray(data.days) ? data.days : [];
+      const sel = $("day-select");
+      sel.replaceChildren(...days.map((d) => { const o = el("option", "", czDate(d.day)); o.value = d.day; return o; }));
+      const m = location.hash.match(/^#d-(\d{4}-\d{2}-\d{2})$/);
+      const i = m ? days.findIndex((d) => d.day === m[1]) : -1;
+      idx = i >= 0 ? i : 0;
+      render();
+    })
+    .catch(() => {
+      const s = el("div", "state");
+      s.append(el("strong", "", "Digest se nepodařilo načíst"), document.createTextNode("Soubor s daty chybí nebo je poškozený. Spusť znovu „skim“, který stránku publikuje i s daty."));
+      $("content").replaceChildren(s);
+    });
+
+  // Votes: optional. Without the db capability the page stays read-only.
+  (async () => {
+    try { db = await (window.claude && window.claude.use ? window.claude.use("db") : null); } catch { db = null; }
+    if (!db) return;
+    // A late first snapshot only shows a note; the listener stays and the
+    // buttons appear when votes arrive. Only the error callback is final.
+    const timer = setTimeout(() => { if (!votesReady) { votesSlow = true; render(); } }, 10000);
+    db.collection("votes").onSnapshot((snap) => {
+      const next = {};
+      for (const doc of snap.docs) {
+        const v = doc.data();
+        if (v && (v.vote === "up" || v.vote === "down")) {
+          next[doc.id] = { vote: v.vote, imported: v.imported, title: typeof v.title === "string" ? v.title : "" };
+        }
+      }
+      votes = next;
+      votesReady = true;
+      if (!snap.metadata || !snap.metadata.fromCache) { votesSlow = false; clearTimeout(timer); }
+      render();
+    }, () => { clearTimeout(timer); db = null; votesSlow = false; render(); });
+  })();
+})();
+</script>
