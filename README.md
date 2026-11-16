@@ -257,3 +257,7 @@ Working and used daily by the author. Possible next steps:
 
 The project documentation for agents (`CLAUDE.md`, skills) is written in
 Czech — the author's language — while code and this README are in English.
+
+## License
+
+[MIT](LICENSE) © 2026 Josef Podany
