@@ -18,7 +18,7 @@ Když existuje `data/web/artifact-url` (stránka s digestem):
    `vote` je `up` nebo `down`, `title` je text. Ostatní označ jako `skipped` (krok 4).
 3. Seskup podle `day` a pro každý den pošli řádky přes stdin (heredoc
    `<<'EOF'`, nikdy hodnoty z dokumentů v příkazové řádce kromě ověřeného `day`):
-   `go run ./cmd/skimdigest feedback -day <day>` s řádky
+   `./skim digest feedback -day <day>` s řádky
    `{"story": <story>, "vote": "<vote>", "title": "<title>"}`.
    Chyba „titulek nesedí“ (digest byl přestavěn) nebo jiná chyba řádku
    (např. digest dne neexistuje) → ty řádky vynech, zbytek pošli znovu.
@@ -33,7 +33,7 @@ Když existuje `data/web/artifact-url` (stránka s digestem):
 ## 1. Stáhni
 
 ```
-go run ./cmd/skimfetch
+./skim fetch
 ```
 
 - Nenulový exit (rozbitý `feeds.yaml`, úložiště) → vypiš chybu a skonči.
@@ -43,7 +43,7 @@ go run ./cmd/skimfetch
 ## 2. Ohodnoť
 
 Postupuj podle skillu **skim-triage** (přečti `topics.md`, smyčka
-`go run ./cmd/skimtriage pending` → ohodnoť → `save`), dokud `pending`
+`./skim triage pending` → ohodnoť → `save`), dokud `pending`
 není 0. Když je `pending` hned 0, krok přeskoč. Závěrečné shrnutí triage
 nevypisuj zvlášť – stačí počet ohodnocených do statistiky.
 
@@ -51,7 +51,7 @@ nevypisuj zvlášť – stačí počet ohodnocených do statistiky.
 
 Zjisti stav:
 - `data/digest/<dnes>.json` neexistuje → sestav digest podle skillu **skim-digest** (kroky 1–3).
-- Existuje → porovnej ID z `go run ./cmd/skimdigest candidates -min 4`
+- Existuje → porovnej ID z `./skim digest candidates -min 4`
   s ID v `stories[].articles[].id` a `more[].id` v tom JSON:
   - všechna už tam jsou → digest nepřestavuj, jen ho ukaž,
   - přibyla nová → sestav digest znovu (celý, ze všech kandidátů dne) a pošli ho s `-force`; v chatu řekni, že byl aktualizován.
@@ -59,7 +59,7 @@ Zjisti stav:
 
 ## 3b. Publikuj stránku
 
-1. `go run ./cmd/skimdigest export` → `data/web/digests.json`.
+1. `./skim digest export` → `data/web/digests.json`.
 2. Artifact publish: `file_path` = `web/digest.html`,
    `files` = `{"digests.json": "data/web/digests.json"}`,
    `capabilities` = `{"db": {}}`; když existuje `data/web/artifact-url`,
@@ -72,7 +72,7 @@ Zjisti stav:
 1. Jeden řádek statistiky: `Staženo N · ohodnoceno M · příběhů K · selhalo F feedů`
    a odkaz na stránku (`data/web/artifact-url`); převzaté hlasy ze stránky zmiň počtem.
 2. Digest jako v kroku 4 skillu **skim-digest**: po tématech, číslo, **titulek**, jedna věta, odkaz na hlavní zdroj (URL z `data/digest/<dnes>.json`, `articles[0].url`), cesta k souboru, výzva ke zpětné vazbě.
-3. Feedy s `failures >= 3`: vyjmenuj je a nabídni prověření (`go run ./cmd/feedcheck <url>`); změny `feeds.yaml` jen s mým souhlasem.
+3. Feedy s `failures >= 3`: vyjmenuj je a nabídni prověření (`./skim check <url>`); změny `feeds.yaml` jen s mým souhlasem.
 
 ## 5. Zpětná vazba
 
@@ -81,15 +81,15 @@ Zjisti stav:
 ## 6. Návrh úprav témat
 
 ```
-go run ./cmd/skimtriage report
+./skim triage report
 ```
 
 Když `due` je `true`:
-1. Z `by_feed`, `by_score`, `notes` a z `go run ./cmd/skimtriage examples`
+1. Z `by_feed`, `by_score`, `notes` a z `./skim triage examples`
    najdi 1–3 jasné vzory (např. „r/golang: 6× 👎 u začátečnických dotazů“).
 2. Navrhni konkrétní úpravy polí **Zajímá mě / Nezajímá mě** v `topics.md`
    s doložením (feed, počty, 2–3 titulky).
 3. Uprav `topics.md` jen po mém souhlasu.
-4. Pak vždy (i při odmítnutí) `go run ./cmd/skimtriage report -mark`.
+4. Pak vždy (i při odmítnutí) `./skim triage report -mark`.
 
 Když `due` je `false`, krok přeskoč a nic nevypisuj.

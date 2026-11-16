@@ -12,10 +12,12 @@ parsování, ukládání). Z Go nástrojů později může vyrůst samostatná a
 
 - `topics.md` – témata, která mě zajímají, a co v nich chci / nechci. Zdroj pravdy pro výběr zdrojů i třídění článků.
 - `feeds.yaml` – odebírané feedy. Přidávají se jen po mém schválení.
-- `cmd/feedcheck/` – Go nástroj: ověří RSS/Atom feed (nebo ho najde z URL webu) a vrátí JSONL se stavem, frekvencí a ukázkou titulků.
-- `cmd/skimfetch/` – Go nástroj: stáhne nové články ze všech feedů do `data/` (bez duplicit, podmíněný GET), vrátí JSONL souhrn.
-- `cmd/skimtriage/` – Go nástroj pro evidenci triage: `pending` vypíše neohodnocené články, `save` zvaliduje a uloží hodnocení (vše, nebo nic).
-- `cmd/skimdigest/` – Go nástroj pro digest: `candidates` (ohodnocené články dne), `render` (zvaliduje příběhy od skillu a vykreslí markdown s odkazy z archivu), `feedback` (uloží 👍/👎 k příběhům).
+- `cmd/skim/` – jeden program `skim` se všemi nástroji (`check`, `fetch`, `triage …`, `digest …`, `version`). Spouští se přes `./skim` (použije nainstalovanou binárku, jinak `go run ./cmd/skim`).
+  - `skim check` – ověří RSS/Atom feed (nebo ho najde z URL webu), JSONL se stavem, frekvencí a ukázkou titulků.
+  - `skim fetch` – stáhne nové články do `data/` (bez duplicit, podmíněný GET), JSONL souhrn.
+  - `skim triage` – evidence triage: `pending`, `save` (vše, nebo nic), `examples`, `report`.
+  - `skim digest` – digest: `fulltext`, `candidates`, `render`, `feedback`, `export`.
+- `internal/app/{check,fetch,triage,digest}/` – logika nástrojů; `cmd/feedcheck|skimfetch|skimtriage|skimdigest` jsou kvůli kompatibilitě tenké obálky.
 - `internal/` – sdílené Go balíčky: `feed` (parser RSS/Atom, HTML → text), `feedsfile` (čtení `feeds.yaml`), `store` (archiv a stav).
 - `data/articles/YYYY-MM-DD.jsonl` – archiv článků podle data stažení, jen append. `data/state.json` – co už je stažené, ETagy, selhání. `data/triage/YYYY-MM-DD.jsonl` – hodnocení článků (skóre 1–5 + důvod), den shodný se souborem článku. `data/digest/YYYY-MM-DD.md` (+ `.json`) – denní digest. `data/feedback.jsonl` – zpětná vazba k příběhům. `data/fulltext/YYYY-MM-DD.jsonl` – plný text stažený u kandidátů digestu. `data/proposals.jsonl` – kdy byly naposledy navrženy úpravy `topics.md`.
 - `web/digest.html` – šablona soukromé stránky s digestem (claude.ai artifact); data z `skimdigest export` do `data/web/digests.json`, URL stránky v `data/web/artifact-url`, hlasy 👍/👎 v databázi stránky (kolekce `votes`).
@@ -36,8 +38,8 @@ parsování, ukládání). Z Go nástrojů později může vyrůst samostatná a
 - Komunikace se mnou česky.
 - Do `feeds.yaml` nikdy nepřidávej feed, který neprošel `feedcheck` (`ok: true`), a nikdy bez mého souhlasu.
 - Go kód: jen standardní knihovna, dokud to jde; `gofmt`, `go vet` a testy musí projít.
-- Ověření feedů: `go run ./cmd/feedcheck <url> [<url> ...]`
-- Stažení článků: `go run ./cmd/skimfetch [-topic <slug>] [-dry-run]`
+- Ověření feedů: `./skim check <url> [<url> ...]`
+- Stažení článků: `./skim fetch [-topic <slug>] [-dry-run]`
 - Soubory v `data/articles/` nikdy nepřepisuj ani nemaž.
-- Triage: `go run ./cmd/skimtriage pending` / `save` / `examples` (hlasy jako vodítko) / `report [-mark]` (návrh úprav témat)
-- Digest: `go run ./cmd/skimdigest fulltext` / `candidates` / `render` / `feedback` / `export` (viz skill `skim-digest`, stránka viz skill `skim`)
+- Triage: `./skim triage pending` / `save` / `examples` (hlasy jako vodítko) / `report [-mark]` (návrh úprav témat)
+- Digest: `./skim digest fulltext` / `candidates` / `render` / `feedback` / `export` (viz skill `skim-digest`, stránka viz skill `skim`)

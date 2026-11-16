@@ -5,3 +5,6 @@ data/
 .superpowers/
 
 .DS_Store
+
+# Release builds
+/dist/

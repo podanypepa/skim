@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Runs the skim tools: an installed `skim` binary if there is one,
+# otherwise `go run ./cmd/skim`. Skills call this script.
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+self="$here/$(basename "${BASH_SOURCE[0]}")"
+cd "$here"
+
+if bin="$(command -v skim 2>/dev/null)"; then
+  # Skip ourselves (when the repo directory is on PATH).
+  real_bin="$(cd "$(dirname "$bin")" && pwd)/$(basename "$bin")"
+  if [ "$real_bin" != "$self" ]; then
+    exec "$bin" "$@"
+  fi
+fi
+if command -v go >/dev/null 2>&1; then
+  exec go run ./cmd/skim "$@"
+fi
+echo "skim: install the skim binary (see README → Install) or Go 1.24+" >&2
+exit 127

@@ -44,7 +44,7 @@ URL feedu si nevymýšlej. Stačí URL webu – `feedcheck` feed najde sám.
 ## 4. Ověř všechny kandidáty najednou
 
 ```
-go run ./cmd/feedcheck <url1> <url2> ...
+./skim check <url1> <url2> ...
 ```
 
 Výstup je JSONL: `ok`, `feed_url`, `title`, `items`, `latest`,

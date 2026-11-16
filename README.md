@@ -118,7 +118,8 @@ a handful of 3s as a "more news" list.
 
 ### Requirements
 
-- **Go 1.24+** (standard library only — no third-party dependencies)
+- **The `skim` binary** from Releases, **or Go 1.24+** (standard library
+  only — no third-party dependencies)
 - **[Claude Code](https://claude.com/claude-code)** for the skills
   (the Go tools also work on their own)
 
@@ -127,8 +128,19 @@ a handful of 3s as a "more news" list.
 ```sh
 git clone https://github.com/podanypepa/skim.git
 cd skim
-go test ./...        # everything should pass
 ```
+
+The skills run the tools through `./skim`, which uses an installed `skim`
+binary when there is one and falls back to `go run ./cmd/skim`. Pick one:
+
+- **No Go needed:** download the archive for your system from
+  [Releases](https://github.com/podanypepa/skim/releases) (macOS Intel /
+  Apple Silicon, Linux, Windows), check it against `SHA256SUMS` and put the
+  `skim` binary on your `PATH`.
+- **With Go 1.24+:** `go install github.com/podanypepa/skim/cmd/skim@latest`.
+- **Or nothing:** with Go installed, `./skim` just works from the repo.
+
+Check with `./skim version`.
 
 The skills live in `skills/` and are exposed to Claude Code through the
 `.claude/skills` symlink, so opening the repository in Claude Code is
@@ -219,29 +231,31 @@ Give feedback in plain words:
 
 Skills never add feeds or change your topics without asking.
 
-## Go tools
+## Tools
 
-All tools print JSONL so they are easy for both humans and agents to read.
+One binary, `skim`, with subcommands. All of them print JSONL so they are
+easy for both humans and agents to read. The older per-tool commands
+(`go run ./cmd/skimfetch` …) still work.
 
 ```sh
 # Check feeds (or find the feed of a website)
-go run ./cmd/feedcheck https://go.dev/blog https://simonwillison.net
+./skim check https://go.dev/blog https://simonwillison.net
 
 # Fetch new articles (all feeds, one topic, or a dry run)
-go run ./cmd/skimfetch [-topic golang] [-dry-run] [-backfill-days 7]
+./skim fetch [-topic golang] [-dry-run] [-backfill-days 7]
 
 # Triage bookkeeping and feedback learning
-go run ./cmd/skimtriage pending [-limit 25] [-days 7] [-topic slug]
-go run ./cmd/skimtriage save < scores.jsonl
-go run ./cmd/skimtriage examples [-n 30]
-go run ./cmd/skimtriage report [-mark]
+./skim triage pending [-limit 25] [-days 7] [-topic slug]
+./skim triage save < scores.jsonl
+./skim triage examples [-n 30]
+./skim triage report [-mark]
 
 # Digest
-go run ./cmd/skimdigest export     [-days 14]   # data for the digest page
-go run ./cmd/skimdigest fulltext   [-day …] [-min 3] [-short 600]
-go run ./cmd/skimdigest candidates [-day 2026-11-16] [-min 3]
-go run ./cmd/skimdigest render     [-day …] [-force] < digest.json
-go run ./cmd/skimdigest feedback    -day …           < feedback.jsonl
+./skim digest export     [-days 14]   # data for the digest page
+./skim digest fulltext   [-day …] [-min 3] [-short 600]
+./skim digest candidates [-day 2026-11-16] [-min 3]
+./skim digest render     [-day …] [-force] < digest.json
+./skim digest feedback    -day …           < feedback.jsonl
 ```
 
 ## Data
@@ -280,12 +294,10 @@ Plain JSONL means you can `grep`, `jq` or open everything in an editor.
 ## Project layout
 
 ```
-cmd/
-  feedcheck/     verify feeds, autodiscover feeds from websites
-  skimfetch/     fetch new articles into the archive
-  skimtriage/    pending / save for triage
-  skimdigest/    candidates / render / feedback for the digest
+cmd/skim/        the skim binary (check, fetch, triage, digest)
+cmd/feedcheck|skimfetch|skimtriage|skimdigest/  compatibility wrappers
 internal/
+  app/           tool logic: check, fetch, triage, digest
   feed/          RSS / RDF / Atom parser, HTML → text
   feedsfile/     feeds.yaml reader
   store/         archive, state, triage and feedback storage

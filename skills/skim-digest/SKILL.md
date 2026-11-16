@@ -7,7 +7,7 @@ description: Sestaví denní přehled (digest) nejlepších článků – slouč
 
 Úsudek (co je jeden příběh, co je důležité, shrnutí) děláš ty. Spojení
 dat, validaci a vykreslení markdownu s odkazy z archivu dělá Go nástroj
-`cmd/skimdigest`. Odkazy nikdy nepíšeš ručně.
+`./skim digest`. Odkazy nikdy nepíšeš ručně.
 
 Den digestu = den stažení článků (`data/articles/<den>.jsonl`). Bez
 `-day` je to dnešek.
@@ -19,13 +19,13 @@ jen to, co ještě nezkoušel; respektuje robots.txt, weby blokující roboty
 – např. Reddit – zůstanou u perexu z feedu):
 
 ```
-go run ./cmd/skimdigest fulltext [-day YYYY-MM-DD]
+./skim digest fulltext [-day YYYY-MM-DD]
 ```
 
 Pak:
 
 ```
-go run ./cmd/skimdigest candidates [-day YYYY-MM-DD]
+./skim digest candidates [-day YYYY-MM-DD]
 ```
 
 JSONL seřazené podle skóre: `id, topic, score, reason, feed_title, title,
@@ -53,7 +53,7 @@ url, published, excerpt`; poslední řádek
 Pošli jeden JSON objekt:
 
 ```
-go run ./cmd/skimdigest render [-day YYYY-MM-DD] <<'EOF'
+./skim digest render [-day YYYY-MM-DD] <<'EOF'
 {"stories":[
  {"topic":"ai-novinky","title":"…","summary":"…","ids":["…","…"]}
 ],"more":["…"]}
@@ -82,7 +82,7 @@ zapiš je – jeden řádek na příběh. **Vždy uveď `-day`** dne digestu, o 
 mluvíme (čísla příběhů platí jen pro daný den):
 
 ```
-go run ./cmd/skimdigest feedback -day YYYY-MM-DD <<'EOF'
+./skim digest feedback -day YYYY-MM-DD <<'EOF'
 {"story":3,"vote":"up"}
 {"story":7,"vote":"down","note":"případová studie"}
 EOF

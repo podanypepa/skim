@@ -6,7 +6,7 @@ description: Ohodnotí nově stažené články skóre 1–5 podle topics.md a z
 # skim-triage
 
 Úsudek (co je relevantní) děláš ty. Evidenci a validaci dělá Go nástroj
-`cmd/skimtriage`: `pending` vypíše neohodnocené články, `save` uloží
+`./skim triage`: `pending` vypíše neohodnocené články, `save` uloží
 hodnocení do `data/triage/<den>.jsonl` (vše, nebo nic).
 
 ## Škála
@@ -23,12 +23,12 @@ Buď přísný: pětek je málo, čtyřky musí mít skutečný obsah.
 ## Postup
 
 1. Přečti `topics.md` – u každého tématu pole **Zajímá mě**, **Nezajímá mě**, **Hloubka**.
-   Pak `go run ./cmd/skimtriage examples` – moje nedávné hlasy 👍/👎 k článkům
+   Pak `./skim triage examples` – moje nedávné hlasy 👍/👎 k článkům
    (nesoulady s tvým skóre jsou první). Ber je jako vodítko pro jemné
    rozdíly; při rozporu s `topics.md` platí `topics.md`. Žádné hlasy → pokračuj.
 2. Vypiš dávku:
    ```
-   go run ./cmd/skimtriage pending
+   ./skim triage pending
    ```
    JSONL: `id, day, topic, feed_title, title, url, published, excerpt`;
    poslední řádek `{"summary":true,"pending":N,"shown":M}`. Když je
@@ -39,7 +39,7 @@ Buď přísný: pětek je málo, čtyřky musí mít skutečný obsah.
    - `reason`: jedna věta česky, konkrétní – co článek přináší, nebo proč je šum (ne „relevantní článek o AI“).
 4. Ulož celou dávku najednou:
    ```
-   go run ./cmd/skimtriage save <<'EOF'
+   ./skim triage save <<'EOF'
    {"id":"…","score":4,"reason":"…"}
    EOF
    ```

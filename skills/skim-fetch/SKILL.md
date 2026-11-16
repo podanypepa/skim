@@ -5,13 +5,13 @@ description: Stáhne nové články ze všech odebíraných feedů (feeds.yaml) 
 
 # skim-fetch
 
-Stahování je deterministická práce – dělá ji Go nástroj `cmd/skimfetch`.
+Stahování je deterministická práce – dělá ji Go nástroj `./skim fetch`.
 Tvoje role: spustit ho, česky shrnout výsledek a ohlídat selhávající feedy.
 
 ## 1. Spusť
 
 ```
-go run ./cmd/skimfetch
+./skim fetch
 ```
 
 Jen jedno téma: `-topic <slug>`. Jen zkouška bez zápisu: `-dry-run`.
@@ -35,7 +35,7 @@ Nenulový exit = chyba konfigurace nebo úložiště (např. rozbitý
 ## 3. Ohlídej selhávající feedy
 
 Feed s `failures >= 3` (selhal 3× po sobě):
-1. ověř ho: `go run ./cmd/feedcheck <url>`,
+1. ověř ho: `./skim check <url>`,
 2. když feedcheck najde jinou funkční URL, navrhni opravu `url` ve `feeds.yaml`,
 3. když je zdroj mrtvý, navrhni odebrání.
 
