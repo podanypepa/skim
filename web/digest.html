@@ -32,14 +32,15 @@
   --up: #5cc78f; --down: #f0857c; color-scheme: dark;
 }
 * { box-sizing: border-box; }
+html { font-size: 18px; }
 body {
-  background: var(--bg); color: var(--fg); font: 15px/1.6 var(--font-body);
+  background: var(--bg); color: var(--fg); font: 1rem/1.6 var(--font-body);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 0 48px;
 }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
-.wrap { max-width: 44rem; margin: 0 auto; }
+.wrap { max-width: 42rem; margin: 0 auto; }
 a { color: var(--accent); }
 a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 
@@ -55,6 +56,11 @@ a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visib
   border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer;
 }
 .day button:disabled { opacity: 0.4; cursor: default; }
+.theme {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 500 0.85rem var(--font-body); color: var(--fg); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer;
+}
 .meta { width: 100%; color: var(--muted); font-size: 0.85rem; }
 .topics { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
 .topics a {
@@ -109,6 +115,7 @@ details.more li { overflow-wrap: anywhere; }
 <div class="wrap">
   <div class="bar">
     <h1 class="brand">Skim</h1>
+    <button type="button" class="theme" id="theme" aria-label="Přepnout vzhled"></button>
     <div class="day" id="day-nav" hidden>
       <button type="button" id="prev" aria-label="Starší den">‹</button>
       <select id="day-select" aria-label="Den digestu"></select>
@@ -166,6 +173,23 @@ details.more li { overflow-wrap: anywhere; }
     return s;
   }
   const COPY_ICON = ["M9 9h10v10H9z", "M5 15V5h10"];
+
+  // Theme: auto (follows the device) → light → dark; remembered per device.
+  const THEMES = [
+    { id: "auto", label: "Auto", icon: ["M12 3a9 9 0 1 0 0 18z", "M12 3a9 9 0 0 1 0 18"] },
+    { id: "light", label: "Světlý", icon: ["M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8", "M12 2v2", "M12 20v2", "M4.9 4.9l1.4 1.4", "M17.7 17.7l1.4 1.4", "M2 12h2", "M20 12h2", "M4.9 19.1l1.4-1.4", "M17.7 6.3l1.4-1.4"] },
+    { id: "dark", label: "Tmavý", icon: ["M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"] },
+  ];
+  let theme = "auto";
+  try { theme = localStorage.getItem("skim-theme") || "auto"; } catch {}
+  function applyTheme() {
+    const t = THEMES.find((x) => x.id === theme) || THEMES[0];
+    if (t.id === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", t.id);
+    const b = document.getElementById("theme");
+    b.replaceChildren(icon(t.icon), document.createTextNode(t.label));
+    b.title = "Vzhled: " + t.label + " (klepnutím přepneš)";
+  }
   const DONE_ICON = ["M5 12l4 4L19 7"];
 
   // Copy button after a link; falls back to selecting the link text when
@@ -316,6 +340,13 @@ details.more li { overflow-wrap: anywhere; }
     window.scrollTo(0, 0);
   }
 
+  applyTheme();
+  $("theme").addEventListener("click", () => {
+    const i = THEMES.findIndex((x) => x.id === theme);
+    theme = THEMES[(i + 1) % THEMES.length].id;
+    try { localStorage.setItem("skim-theme", theme); } catch {}
+    applyTheme();
+  });
   $("prev").addEventListener("click", () => selectDay(idx + 1));
   $("next").addEventListener("click", () => selectDay(idx - 1));
   $("day-select").addEventListener("change", (e) => selectDay(days.findIndex((d) => d.day === e.target.value)));
