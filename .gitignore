@@ -1,0 +1,7 @@
+# Personal archive: fetched articles (third-party content), fetch state, triage, digests, feedback
+data/
+
+# Agent scratch
+.superpowers/
+
+.DS_Store

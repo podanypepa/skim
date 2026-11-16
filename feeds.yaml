@@ -1,0 +1,201 @@
+# Odebírané feedy. Spravuje skill skim-discover (po schválení), lze upravovat ručně.
+#
+# Položka:
+#   - title: název zdroje
+#     url: URL feedu (ověřená přes cmd/feedcheck)
+#     site: URL webu
+#     topic: slug tématu z topics.md
+#     kind: blog | news | newsletter | research | aggregator | video | podcast | community
+#     added: YYYY-MM-DD
+#     why: proč tento zdroj odebírám (jedna věta)
+
+feeds:
+  - title: "OpenAI News"
+    url: "https://openai.com/news/rss.xml"
+    site: "https://openai.com/news/"
+    topic: ai-novinky
+    kind: blog
+    added: 2026-11-16
+    why: "Primární zdroj pro releasy a oznámení OpenAI."
+  - title: "Anthropic News"
+    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml"
+    site: "https://www.anthropic.com/news"
+    topic: ai-novinky
+    kind: blog
+    added: 2026-11-16
+    why: "Releasy Claude; Anthropic nemá vlastní RSS, jde o komunitní zrcadlo Olshansk/rss-feeds."
+  - title: "Google DeepMind News"
+    url: "https://deepmind.google/blog/rss.xml"
+    site: "https://deepmind.google/blog/"
+    topic: ai-novinky
+    kind: blog
+    added: 2026-11-16
+    why: "Gemini, AlphaFold a další výzkum přímo od DeepMind."
+  - title: "Hugging Face Blog"
+    url: "https://huggingface.co/blog/feed.xml"
+    site: "https://huggingface.co/blog"
+    topic: ai-novinky
+    kind: blog
+    added: 2026-11-16
+    why: "Open-source modely, nástroje a ekosystém kolem nich."
+  - title: "Simon Willison's Weblog: Entries"
+    url: "https://simonwillison.net/atom/entries/"
+    site: "https://simonwillison.net"
+    topic: ai-novinky
+    kind: blog
+    added: 2026-11-16
+    why: "Nejlepší praktický pohled na LLM a nástroje, bez drobných release poznámek."
+  - title: "Latent Space"
+    url: "https://latent.space/feeds/all.xml"
+    site: "https://www.latent.space"
+    topic: ai-novinky
+    kind: newsletter
+    added: 2026-11-16
+    why: "Denní souhrn AINews a rozhovory s lidmi z laboratoří."
+  - title: "Interconnects AI"
+    url: "https://www.interconnects.ai/feed"
+    site: "https://www.interconnects.ai"
+    topic: ai-novinky
+    kind: newsletter
+    added: 2026-11-16
+    why: "Open modely, trénování a benchmarky do hloubky."
+  - title: "Import AI"
+    url: "https://importai.substack.com/feed"
+    site: "https://importai.substack.com"
+    topic: ai-novinky
+    kind: newsletter
+    added: 2026-11-16
+    why: "Týdenní výběr výzkumu a politiky AI od Jacka Clarka."
+  - title: "Ars Technica AI"
+    url: "https://arstechnica.com/ai/feed/"
+    site: "https://arstechnica.com/ai/"
+    topic: ai-novinky
+    kind: news
+    added: 2026-11-16
+    why: "Kvalitní zpravodajství o AI včetně byznysu a dopadů."
+  - title: "The EU AI Act Newsletter"
+    url: "https://artificialintelligenceact.substack.com/feed"
+    site: "https://artificialintelligenceact.substack.com"
+    topic: ai-novinky
+    kind: newsletter
+    added: 2026-11-16
+    why: "Regulace AI v EU a vývoj kolem AI Act."
+  - title: "One Useful Thing"
+    url: "https://www.oneusefulthing.org/feed"
+    site: "https://www.oneusefulthing.org"
+    topic: ai-novinky
+    kind: newsletter
+    added: 2026-11-16
+    why: "Praktické použití AI a jeho dopady od Ethana Mollicka."
+  - title: "Epoch AI"
+    url: "https://epoch.ai/atom.xml"
+    site: "https://epoch.ai/blog"
+    topic: ai-novinky
+    kind: research
+    added: 2026-11-16
+    why: "Data o výpočetním výkonu, trendech a ekonomice AI."
+  - title: "Go Blog"
+    url: "https://go.dev/blog/feed.atom"
+    site: "https://go.dev/blog"
+    topic: golang
+    kind: blog
+    added: 2026-11-16
+    why: "Oficiální blog Go: releasy, nové API a změny jazyka."
+  - title: "Golang Weekly"
+    url: "https://golangweekly.com/rss"
+    site: "https://golangweekly.com"
+    topic: golang
+    kind: newsletter
+    added: 2026-11-16
+    why: "Týdenní výběr toho nejlepšího z Go ekosystému."
+  - title: "Ardan Labs Blog"
+    url: "https://www.ardanlabs.com/index.xml"
+    site: "https://www.ardanlabs.com/blog/"
+    topic: golang
+    kind: blog
+    added: 2026-11-16
+    why: "Rozbory Go do hloubky (runtime, profilování, nové verze)."
+  - title: "Anton Zhiyanov"
+    url: "https://antonz.org/feed"
+    site: "https://antonz.org"
+    topic: golang
+    kind: blog
+    added: 2026-11-16
+    why: "Interaktivní průvodci novými verzemi Go a souběhem."
+  - title: "Lobsters: go"
+    url: "https://lobste.rs/t/go.rss"
+    site: "https://lobste.rs/t/go"
+    topic: golang
+    kind: community
+    added: 2026-11-16
+    why: "Kurátorovaná komunita s nízkým šumem."
+  - title: "r/golang (top za týden)"
+    url: "https://www.reddit.com/r/golang/top/.rss?t=week"
+    site: "https://www.reddit.com/r/golang/"
+    topic: golang
+    kind: community
+    added: 2026-11-16
+    why: "Komunita s denním objemem; šum odfiltruje triage."
+  - title: "Python Insider"
+    url: "https://blog.python.org/rss.xml"
+    site: "https://blog.python.org"
+    topic: python
+    kind: blog
+    added: 2026-11-16
+    why: "Oficiální releasy a novinky CPythonu."
+  - title: "PEPs"
+    url: "https://peps.python.org/peps.rss"
+    site: "https://peps.python.org"
+    topic: python
+    kind: news
+    added: 2026-11-16
+    why: "Nové PEPy – navrhované změny jazyka."
+  - title: "PyCoder's Weekly"
+    url: "https://pycoders.com/feed"
+    site: "https://pycoders.com"
+    topic: python
+    kind: newsletter
+    added: 2026-11-16
+    why: "Týdenní výběr z Python ekosystému."
+  - title: "Astral Blog"
+    url: "https://astral.sh/blog/rss.xml"
+    site: "https://astral.sh/blog"
+    topic: python
+    kind: blog
+    added: 2026-11-16
+    why: "uv, ruff, ty – moderní Python tooling."
+  - title: "PyPI Blog"
+    url: "https://blog.pypi.org/feed_rss_created.xml"
+    site: "https://blog.pypi.org"
+    topic: python
+    kind: blog
+    added: 2026-11-16
+    why: "Packaging a bezpečnost balíčků."
+  - title: "Polars Blog"
+    url: "https://pola.rs/rss.xml"
+    site: "https://pola.rs/posts/"
+    topic: python
+    kind: blog
+    added: 2026-11-16
+    why: "Data a výkon s Polars."
+  - title: "PyTorch Blog"
+    url: "https://pytorch.org/feed/"
+    site: "https://pytorch.org/blog/"
+    topic: python
+    kind: blog
+    added: 2026-11-16
+    why: "ML, kernely a kompilace v PyTorch."
+  - title: "Lobsters: python"
+    url: "https://lobste.rs/t/python.rss"
+    site: "https://lobste.rs/t/python"
+    topic: python
+    kind: community
+    added: 2026-11-16
+    why: "Kurátorovaná komunita s nízkým šumem."
+  - title: "Planet Python"
+    url: "https://planetpython.org/rss20.xml"
+    site: "https://planetpython.org"
+    topic: python
+    kind: aggregator
+    added: 2026-11-16
+    why: "Agregace desítek Python blogů; šum odfiltruje triage."
