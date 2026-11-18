@@ -93,3 +93,25 @@ Když `due` je `true`:
 4. Pak vždy (i při odmítnutí) `./skim triage report -mark`.
 
 Když `due` je `false`, krok přeskoč a nic nevypisuj.
+
+## Běh bez obsluhy
+
+Když zadání říká „režim bez obsluhy“ (spouští ho `scripts/daily.sh`
+z launchd), nikdo u toho není a nikdo neodpoví. Neschválené nástroje
+a příkazy se rovnou zamítají, proto:
+
+- Na nic se neptej a na nic nečekej. Co by vyžadovalo můj souhlas, přeskoč.
+- Příkazy `./skim …` spouštěj **samostatně**: bez `;`, `&&`, `|` a bez
+  přesměrování do souborů mimo projekt (žádné `/tmp`). Výstup čti přímo
+  z výsledku příkazu. Data pro `save` / `feedback` posílej heredocem
+  (`./skim triage save <<'EOF'`), to je v pořádku.
+- Kroky 0 (hlasy ze stránky) a 3b (publikace) **přeskoč**: Claude Code bez
+  obsluhy nemá nástroje pro artifacty. `./skim digest export` po tobě spustí
+  `scripts/daily.sh` a stránku aktualizuje naplánovaná úloha v claude.ai.
+  Hlasy ze stránky se převezmou při příštím ručním spuštění `skim`.
+- `feeds.yaml`, `topics.md` ani nic mimo `data/` neměň.
+- Krok 4: vypiš jen řádek statistiky (první řádek výstupu – jde do notifikace)
+  a pod něj feedy s `failures >= 3`, bez nabídek a otázek.
+- Kroky 5 a 6 přeskoč úplně; `./skim triage report -mark` nevolej
+  (návrh úprav témat dostanu při příštím ručním spuštění).
+- Kdykoli by běh skončil chybou, první řádek výstupu začni `CHYBA:` a stručně popiš proč.

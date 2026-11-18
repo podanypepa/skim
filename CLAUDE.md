@@ -21,12 +21,14 @@ parsování, ukládání). Z Go nástrojů později může vyrůst samostatná a
 - `internal/` – sdílené Go balíčky: `feed` (parser RSS/Atom, HTML → text), `feedsfile` (čtení `feeds.yaml`), `store` (archiv a stav).
 - `data/articles/YYYY-MM-DD.jsonl` – archiv článků podle data stažení, jen append. `data/state.json` – co už je stažené, ETagy, selhání. `data/triage/YYYY-MM-DD.jsonl` – hodnocení článků (skóre 1–5 + důvod), den shodný se souborem článku. `data/digest/YYYY-MM-DD.md` (+ `.json`) – denní digest. `data/feedback.jsonl` – zpětná vazba k příběhům. `data/fulltext/YYYY-MM-DD.jsonl` – plný text stažený u kandidátů digestu. `data/proposals.jsonl` – kdy byly naposledy navrženy úpravy `topics.md`.
 - `web/digest.html` – šablona soukromé stránky s digestem (claude.ai artifact); data z `skimdigest export` do `data/web/digests.json`, URL stránky v `data/web/artifact-url`, hlasy 👍/👎 v databázi stránky (kolekce `votes`).
+- `scripts/` – `daily.sh` (denní běh bez obsluhy přes `claude -p`) a `install-daily.sh` (launchd).
 - `docs/superpowers/` – návrhy a plány implementace.
 - `skills/` – skilly agenta (do `.claude/skills` připojené symlinkem).
 
 ## Skilly
 
 - `skim` – **hlavní vstup na každý den**: stáhne, ohodnotí a ukáže digest ze všech témat (skládá `skim-triage` a `skim-digest`).
+  Každé ráno ho bez obsluhy spouští launchd přes `scripts/daily.sh` (instalace `scripts/install-daily.sh`, logy v `data/logs/`).
 - `skim-discover` – k zadanému tématu najde, ověří a nabídne zdroje; po schválení je přidá do `feeds.yaml`.
 - `skim-topics` – přehled témat s počty feedů; přidání, přejmenování, sloučení a smazání tématu (drží `topics.md` a `feeds.yaml` v souladu).
 - `skim-fetch` – stáhne nové články do archivu a česky shrne, co přibylo a které feedy selhávají.

@@ -209,6 +209,25 @@ signed in to the same Claude account — including the Claude mobile app.
 Votes you give on the phone are imported the next time `skim` runs on
 your computer.
 
+#### Fresh digest every morning
+
+`scripts/daily.sh` runs `skim` unattended (`claude -p` with a narrow tool
+allowlist: `./skim` and the artifact tools only). It never asks questions
+and never touches `feeds.yaml` or `topics.md`; topic proposals wait for your
+next manual run. Install it as a macOS launchd job:
+
+```sh
+./scripts/install-daily.sh          # every day at 6:40
+./scripts/install-daily.sh 7 15     # or pick a time
+./scripts/install-daily.sh uninstall
+```
+
+If the Mac is asleep at that time, launchd runs the missed job as soon as it
+wakes. Each run leaves `data/logs/daily-YYYY-MM-DD.json` and a macOS
+notification; the page link stays the same, so the phone just shows the new
+day. To wake the Mac for it: `sudo pmset repeat wakeorpoweron MTWRFSU 06:35:00`
+(works on power; a closed lid on battery waits until you open it).
+
 <p align="center">
   <img src="docs/images/digest-page-light.png" alt="Digest page on desktop in light mode: topic chips, story cards with score, summary, sources and vote buttons" width="68%">
   &nbsp;
